@@ -1,43 +1,23 @@
 # airflow-gfw
 
-[Airflow](https://airflow.apache.org/) extension for GFW pipeline.
+It is a package providing an [Airflow](https://airflow.apache.org/) extension for GFW pipeline.
 
-## Installation
+##Description
 
-You just need [docker](https://www.docker.com/) and
-[docker-compose](https://docs.docker.com/compose/) in your machine to run the
-pipeline. No other dependency is required.
+The `airflow-gfw` module provides the Airflow components properly build for GFW purposes.
+Extends the Operators such as [BigQueryOperator](https://github.com/apache/airflow/blob/1.10.2/airflow/contrib/operators/bigquery_operator.py), [DataflowOperator](https://github.com/apache/airflow/blob/1.10.2/airflow/contrib/operators/dataflow_operator.py), [PythonOperator](https://airflow.apache.org/howto/operator.html#pythonoperator), etc.
+It defines the environment, adjusts the default arguments and handles a configuration dictionary and a factory of DagRun to use it in different pipelines.
 
-## Usage
+###Usage
 
-Run unit tests
-  Quick run
-  `docker-compose run tests`
-
-  Run with all tests including ones that hit some GCP API
-  `docker-compose run tests --runslow`
-
-Re-build the docker environment (needed if you modify setup.py or other environmental change)
-  `docker-compose build -t gfw/airflow-gfw:<version> .`
-
-You can run the unit tests outside of docker like this
-  ` py.test tests`
-which may be convenient when debugging stuff.  If you do this then you will need
-to clear out the `__pycache__` with
-    `rm -rf tests/__pycache__/`
-
-## Development
-
-To setup your development environment you have 2 options. The recommended way is through [docker](https://www.docker.com/), although you can also use a local [python](https://www.python.org/) installation if you prefer so.
-
-
-### Local python
-
-You need to have [python](https://www.python.org/) 2.7. [Virtualenv](https://virtualenv.pypa.io/en/stable/) is recommended as well. Just run the following commands to run the tests, and you are ready to start hacking around:
-
-```cconsole
-virtualenv venv
-source venv/bin/activate
-pip install -e .
-py.test tests
+Includes in your project as
 ```
+pip install https://codeload.github.com/GlobalFishingWatch/airflow-gfw/tar.gz/<version>
+```
+
+You can find the registry of changes in the `CHANGES.md` file.
+
+Every time you want to make a change in this repo, please run the test or generate the proper ones.
+
+To Run unit tests use the following
+  `docker-compose run tests`
