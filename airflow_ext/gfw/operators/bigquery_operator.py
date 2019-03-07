@@ -7,7 +7,7 @@ from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
-from airflow.gfw.operators.timestamp import daterange, str2date
+from airflow_ext.gfw.operators.timestamp import daterange, str2date
 
 
 class BigQueryCreateEmptyTableOperator(BaseOperator):
