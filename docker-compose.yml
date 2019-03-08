@@ -1,0 +1,15 @@
+version: '2'
+services:
+  test:
+    image: gfw/airflow-gfw
+    build: .
+    command: py.test tests
+    volumes:
+      - "./:/opt/project"
+
+  bash:
+    image: gfw/airflow-gfw
+    build: .
+    command: bash
+    volumes:
+      - "./:/opt/project"
