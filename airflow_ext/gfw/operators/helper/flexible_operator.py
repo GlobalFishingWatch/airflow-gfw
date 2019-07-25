@@ -10,7 +10,7 @@ class FlexibleOperator:
         self.operator_parameters = parameters
 
     def build_operator(self, kind):
-        if kind != 'bash' or kind != 'kubernetes':
+        if kind != 'bash' and kind != 'kubernetes':
             raise ValueError('The operators allowed are bash or kubernetes, not <{}>'.format(kind))
         assert self.operator_parameters['task_id']
         assert self.operator_parameters['pool']
@@ -38,11 +38,11 @@ class FlexibleOperator:
             commands = ['./scripts/run.sh']
             commands.append(cmds)
             operator = KubernetesPodOperator(
+                namespace = os.getenv('K8_NAMESPACE'),
                 image = self.operator_parameters['image'],
                 name = self.operator_parameters['name'],
                 dag = self.operator_parameters['dag'],
                 cmds = commands,
-                namespace = os.getenv('K8_NAMESPACE'),
                 task_id = task_id,
                 pool = pool,
                 get_logs = True,
