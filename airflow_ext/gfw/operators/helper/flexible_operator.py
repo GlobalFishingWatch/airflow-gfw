@@ -27,7 +27,7 @@ class FlexibleOperator:
                 self.operator_parameters['image'],
                 ' '.join(cmds))
             # Left only the extra parameters that are not the bash_command
-            extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'cmds','image','docker_run'})) }
+            extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'cmds','image','docker_run','name','dag'})) }
             operator = BashOperator(
                 bash_command = commands,
                 **extra_params
@@ -35,19 +35,14 @@ class FlexibleOperator:
         else:
             assert self.operator_parameters['name']
             assert self.operator_parameters['dag']
-            commands = ['./scripts/run.sh']
-            commands.append(cmds)
+            self.operator_parameters['cmds'].insert(0, './scripts/run.sh')
+            self.operator_parameters.update(get_logs=True, in_cluster=True)
+            # Left only the extra parameters that are not the kubernetes_command
+            extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'image','docker_run','name'})) }
             operator = KubernetesPodOperator(
                 namespace = os.getenv('K8_NAMESPACE'),
                 image = self.operator_parameters['image'],
                 name = self.operator_parameters['name'],
-                dag = self.operator_parameters['dag'],
-                cmds = commands,
-                task_id = task_id,
-                pool = pool,
-                get_logs = True,
-                in_cluster = True
+                **extra_params
             )
         return operator
-
-
