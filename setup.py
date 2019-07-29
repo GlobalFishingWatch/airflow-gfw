@@ -25,7 +25,7 @@ DEPENDENCIES = [
 ]
 
 AIRFLOW_DEPENDENCIES = [
-    "google-api-python-client",
+    "google-api-python-client==1.7.9",
     "snakebite"
 ]
 
