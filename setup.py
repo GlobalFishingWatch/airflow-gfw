@@ -21,11 +21,12 @@ DEPENDENCIES = [
     "pytest",
     "python-dateutil",
     "pytz",
-    "udatetime"
+    "udatetime",
+    "tzlocal==1.5.1"
 ]
 
 AIRFLOW_DEPENDENCIES = [
-    "google-api-python-client==1.7.9",
+    "google-api-python-client",
     "snakebite"
 ]
 
