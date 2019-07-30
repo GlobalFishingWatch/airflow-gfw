@@ -2,6 +2,7 @@ from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOpera
 from airflow.operators.bash_operator import BashOperator
 
 import os
+import os.path
 
 
 class FlexibleOperator:
@@ -35,10 +36,13 @@ class FlexibleOperator:
         else:
             assert self.operator_parameters['name']
             assert self.operator_parameters['dag']
-            self.operator_parameters['cmds'].insert(0, './scripts/run.sh')
+            # some pipelines has file run and not run.sh
+            run_path='./scripts/run.sh' if os.path.isfile('./scripts/run.sh') else './scripts/run'
+            self.operator_parameters['cmds'].insert(0, run_path)
             self.operator_parameters.update(get_logs=True, in_cluster=True)
             # Left only the extra parameters that are not the kubernetes_command
             extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'image','docker_run','name'})) }
+            print '>>>>>>>> EXTRA PARAMTERS FOR KUBERNETES {}'.format(self.operator_parameters)
             operator = KubernetesPodOperator(
                 namespace = os.getenv('K8_NAMESPACE'),
                 image = self.operator_parameters['image'],
