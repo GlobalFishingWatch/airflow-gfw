@@ -42,7 +42,6 @@ class FlexibleOperator:
             self.operator_parameters.update(get_logs=True, in_cluster=True)
             # Left only the extra parameters that are not the kubernetes_command
             extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'image','docker_run','name'})) }
-            print '>>>>>>>> EXTRA PARAMTERS FOR KUBERNETES {}'.format(self.operator_parameters)
             operator = KubernetesPodOperator(
                 namespace = os.getenv('K8_NAMESPACE'),
                 image = self.operator_parameters['image'],
