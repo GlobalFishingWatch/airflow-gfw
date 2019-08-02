@@ -15,20 +15,20 @@ class FlexibleOperator:
             raise ValueError('The operators allowed are bash or kubernetes, not <{}>'.format(kind))
         assert self.operator_parameters['task_id']
         assert self.operator_parameters['pool']
-        assert self.operator_parameters['cmds']
+        assert self.operator_parameters['arguments']
         assert self.operator_parameters['image']
         task_id = self.operator_parameters['task_id']
         pool = self.operator_parameters['pool']
-        cmds = self.operator_parameters['cmds']
+        arguments = self.operator_parameters['arguments']
         operator = None
         if kind == 'bash':
             assert self.operator_parameters['docker_run']
             commands = '{} {} {}'.format(
                 self.operator_parameters['docker_run'],
                 self.operator_parameters['image'],
-                ' '.join(cmds))
+                ' '.join(arguments))
             # Left only the extra parameters that are not the bash_command
-            extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'cmds','image','docker_run','name','dag'})) }
+            extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'arguments','image','docker_run','name','dag'})) }
             operator = BashOperator(
                 bash_command = commands,
                 **extra_params
@@ -36,9 +36,6 @@ class FlexibleOperator:
         else:
             assert self.operator_parameters['name']
             assert self.operator_parameters['dag']
-            # some pipelines has file run and not run.sh
-            run_path='./scripts/run.sh' if os.path.isfile('./scripts/run.sh') else './scripts/run'
-            self.operator_parameters['cmds'].insert(0, run_path)
             self.operator_parameters.update(get_logs=True, in_cluster=True)
             # Left only the extra parameters that are not the kubernetes_command
             extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'image','docker_run','name'})) }
