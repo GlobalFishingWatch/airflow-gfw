@@ -1,6 +1,7 @@
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 from airflow.operators.bash_operator import BashOperator
 
+import logging
 import os
 import os.path
 
@@ -29,6 +30,7 @@ class FlexibleOperator:
                 ' '.join(arguments))
             # Left only the extra parameters that are not the bash_command
             extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'arguments','image','docker_run','name','dag'})) }
+            logging.info('Running BashOperator(commands={}, {})'.format(commands, ', '.join(['{0}={1}'.format(k,v) for k,v in extra_params.iteritems()])))
             operator = BashOperator(
                 bash_command = commands,
                 **extra_params
@@ -38,7 +40,8 @@ class FlexibleOperator:
             assert self.operator_parameters['dag']
             self.operator_parameters.update(get_logs=True, in_cluster=True, pool='k8operators_limit')
             # Left only the extra parameters that are not the kubernetes_command
-            extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'image','docker_run','name','pool'})) }
+            extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'image','docker_run','name'})) }
+            logging.info('Running KubernetesPodOperator(namespace={}, image={}, name={}, {})'.format(os.getenv('K8_NAMESPACE'), self.operator_parameters['image'], self.operator_parameters['name'], ', '.join(['{0}={1}'.format(k,v) for k,v in extra_params.iteritems()])))
             operator = KubernetesPodOperator(
                 namespace = os.getenv('K8_NAMESPACE'),
                 image = self.operator_parameters['image'],
