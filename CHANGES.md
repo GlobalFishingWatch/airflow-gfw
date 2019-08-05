@@ -8,17 +8,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## v0.0.3 - 2019-08-05
-
-  * [#1100](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1100): Changes
-    Avoiding hardcore of pool for kubernetesPodOperator.
-
-
 ## v0.0.2 - 2019-08-05
 
   * [#1100](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1100): Adds
     a FlexibleOperator that could change easily from BashOperator to
     KubernetesPodOperator and fixes the build issue with `tzlocal` lib.
+
+  * [#1100](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1100): Changes
+    Avoiding hardcore of pool for kubernetesPodOperator when instances a
+    FlexibleOperator.
+
 
 ## v0.0.1 - 2019-01-22
 
