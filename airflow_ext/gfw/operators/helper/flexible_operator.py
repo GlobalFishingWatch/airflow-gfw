@@ -15,11 +15,9 @@ class FlexibleOperator:
         if kind != 'bash' and kind != 'kubernetes':
             raise ValueError('The operators allowed are bash or kubernetes, not <{}>'.format(kind))
         assert self.operator_parameters['task_id']
-        assert self.operator_parameters['pool']
         assert self.operator_parameters['arguments']
         assert self.operator_parameters['image']
         task_id = self.operator_parameters['task_id']
-        pool = self.operator_parameters['pool']
         arguments = self.operator_parameters['arguments']
         operator = None
         if kind == 'bash':
