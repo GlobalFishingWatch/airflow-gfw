@@ -38,7 +38,7 @@ class FlexibleOperator:
         else:
             assert self.operator_parameters['name']
             assert self.operator_parameters['dag']
-            self.operator_parameters.update(get_logs=True, in_cluster=True, pool='k8operators_limit')
+            self.operator_parameters.update(get_logs=True, in_cluster=True)
             # Left only the extra parameters that are not the kubernetes_command
             extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'image','docker_run','name'})) }
             logging.debug('Running KubernetesPodOperator(namespace={}, image={}, name={}, {})'.format(os.getenv('K8_NAMESPACE'), self.operator_parameters['image'], self.operator_parameters['name'], ', '.join(['{0}={1}'.format(k,v) for k,v in extra_params.iteritems()])))
