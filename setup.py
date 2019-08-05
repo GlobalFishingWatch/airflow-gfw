@@ -21,7 +21,8 @@ DEPENDENCIES = [
     "pytest",
     "python-dateutil",
     "pytz",
-    "udatetime"
+    "udatetime",
+    "tzlocal==1.5.1"
 ]
 
 AIRFLOW_DEPENDENCIES = [
