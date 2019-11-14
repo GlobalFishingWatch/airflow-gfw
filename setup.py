@@ -12,7 +12,7 @@ from setuptools import setup
 
 
 DEPENDENCIES = [
-    "apache-airflow==1.10.2",
+    "apache-airflow==1.10.5",
     "cryptography",
     "funcsigs==1.0.0",
     "kubernetes==8.0.1",
@@ -22,7 +22,7 @@ DEPENDENCIES = [
     "python-dateutil",
     "pytz",
     "udatetime",
-    "tzlocal==1.5.1"
+    "google-cloud-storage~=1.16"
 ]
 
 AIRFLOW_DEPENDENCIES = [

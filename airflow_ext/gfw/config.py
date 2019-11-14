@@ -1,8 +1,10 @@
+from airflow.contrib.operators.dingding_operator import DingdingOperator
+from airflow.models import Variable
+
 from datetime import datetime
 from datetime import timedelta
-import math
 
-from airflow.models import Variable
+import math
 
 
 CONNECTION_ID = 'google_cloud_default'
@@ -43,6 +45,27 @@ def pipeline_end_date(config):
 
 INITIAL_RETRY_DELAY = 2 * 60
 
+def failure_callback_gfw(context):
+    """
+    The function that will be executed on failure.
+
+    :param context: The context of the executed task.
+    :type context: dict
+    """
+    message = 'AIRFLOW TASK FAILURE TIPS:\n' \
+              'DAG:    {}\n' \
+              'TASKS:  {}\n' \
+              'Reason: {}\n' \
+        .format(context['task_instance'].dag_id,
+                context['task_instance'].task_id,
+                context['exception'])
+    return DingdingOperator(
+        task_id='dingding_success_callback',
+        dingding_conn_id='dingding_default',
+        message_type='text',
+        message=message,
+        at_all=True,
+    ).execute(context)
 
 def default_args(config):
     args = {
@@ -67,6 +90,7 @@ def default_args(config):
         'google_cloud_conn_id': CONNECTION_ID,
         'write_disposition': 'WRITE_TRUNCATE',
         'allow_large_results': True,
+        'on_failure_callback': failure_callback_gfw,
     }
 
     return args
