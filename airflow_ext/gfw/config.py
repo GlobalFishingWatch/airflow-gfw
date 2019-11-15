@@ -1,4 +1,5 @@
-from airflow.contrib.operators.dingding_operator import DingdingOperator
+from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
+from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
 
 from datetime import datetime
@@ -43,7 +44,7 @@ def pipeline_end_date(config):
         return None
 
 
-INITIAL_RETRY_DELAY = 2 * 60
+SLACK_CONN_ID = 'slack'
 
 def failure_callback_gfw(context):
     """
@@ -52,20 +53,28 @@ def failure_callback_gfw(context):
     :param context: The context of the executed task.
     :type context: dict
     """
-    message = 'AIRFLOW TASK FAILURE TIPS:\n' \
+    message = ':red_circle: TASK FAILS:\n' \
               'DAG:    {}\n' \
               'TASKS:  {}\n' \
+              'Log-URL: {}\n' \
               'Reason: {}\n' \
         .format(context['task_instance'].dag_id,
                 context['task_instance'].task_id,
+                context['task_instance'].log_url,
                 context['exception'])
-    return DingdingOperator(
-        task_id='dingding_success_callback',
-        dingding_conn_id='dingding_default',
-        message_type='text',
+
+    slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
+
+    return SlackWebhookOperator(
+        task_id='on_task_failure',
+        http_conn_id=SLACK_CONN_ID,
+        webhook_token=slack_webhook_token,
         message=message,
-        at_all=True,
+        username='airflow'
     ).execute(context)
+
+
+INITIAL_RETRY_DELAY = 2 * 60
 
 def default_args(config):
     args = {
