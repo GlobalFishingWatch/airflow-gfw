@@ -100,6 +100,7 @@ def default_args(config):
         'write_disposition': 'WRITE_TRUNCATE',
         'allow_large_results': True,
         'on_failure_callback': failure_callback_gfw,
+        'on_retry_callback': failure_callback_gfw,
     }
 
     return args
