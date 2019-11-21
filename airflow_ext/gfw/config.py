@@ -44,7 +44,7 @@ def pipeline_end_date(config):
         return None
 
 
-SLACK_CONN_ID = 'slack'
+SLACK_CONN_ID = 'slack_on_failure'
 
 def failure_callback_gfw(context):
     """
@@ -58,10 +58,12 @@ def failure_callback_gfw(context):
               'TASKS:  {}\n' \
               'Log-URL: {}\n' \
               'Reason: {}\n' \
+              'Context: {}\n' \
         .format(context['task_instance'].dag_id,
                 context['task_instance'].task_id,
                 context['task_instance'].log_url,
-                context['exception'])
+                context['exception'],
+                context)
 
     slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
 
