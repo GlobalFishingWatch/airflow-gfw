@@ -44,7 +44,7 @@ def pipeline_end_date(config):
         return None
 
 
-SLACK_CONN_ID = 'slack'
+SLACK_CONN_ID = 'slack_on_failure'
 
 def failure_callback_gfw(context):
     """
@@ -53,14 +53,15 @@ def failure_callback_gfw(context):
     :param context: The context of the executed task.
     :type context: dict
     """
+    ti = context['task_instance']
     message = ':red_circle: TASK FAILS:\n' \
               'DAG:    {}\n' \
               'TASKS:  {}\n' \
               'Log-URL: {}\n' \
               'Reason: {}\n' \
-        .format(context['task_instance'].dag_id,
-                context['task_instance'].task_id,
-                context['task_instance'].log_url,
+        .format(ti.dag_id,
+                ti.task_id,
+                ti.log_url,
                 context['exception'])
 
     slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
@@ -70,7 +71,9 @@ def failure_callback_gfw(context):
         http_conn_id=SLACK_CONN_ID,
         webhook_token=slack_webhook_token,
         message=message,
-        username='airflow'
+        username='airflow',
+        icon_url='https://airflow.apache.org/_images/pin_large.png',
+        link_names=True
     ).execute(context)
 
 
@@ -100,7 +103,6 @@ def default_args(config):
         'write_disposition': 'WRITE_TRUNCATE',
         'allow_large_results': True,
         'on_failure_callback': failure_callback_gfw,
-        'on_retry_callback': failure_callback_gfw,
     }
 
     return args

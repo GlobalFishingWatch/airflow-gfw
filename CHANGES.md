@@ -8,7 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## v0.0.3 - 2019-11-15
+## v0.0.3 - 2019-11-21
 
 ### Changed
 
@@ -20,6 +20,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
   * [#1160](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1160): Adds
     google-cloud-storage lirary to run test for DataFlowDirectRunnnerOperator.
+    SlackWebHookOperator to send notifications when a task fails.
 
 ## v0.0.2 - 2019-08-05
 
