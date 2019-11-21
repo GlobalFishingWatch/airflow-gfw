@@ -1,18 +1,19 @@
-import pytest
-from datetime import timedelta
-import os
-
 from airflow import configuration, DAG
+from airflow.models import Variable
+from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.python_operator import PythonOperator
 from airflow.utils.db import initdb
 from airflow.utils.state import State
 from airflow.utils.timezone import datetime
 from airflow.utils.timezone import utcnow
-from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python_operator import PythonOperator
-from airflow.models import Variable
-from airflow_ext.gfw.operators.python_operator import ExecutionDateBranchOperator
-from airflow_ext.gfw.operators.dataflow_operator import DataFlowDirectRunnerOperator
+
 from airflow_ext.gfw.models import DagFactory
+from airflow_ext.gfw.operators.dataflow_operator import DataFlowDirectRunnerOperator
+from airflow_ext.gfw.operators.python_operator import ExecutionDateBranchOperator
+
+from datetime import timedelta
+import os
+import pytest
 
 DEFAULT_DATE = datetime(2018, 1, 1)
 INTERVAL = timedelta(hours=24)
