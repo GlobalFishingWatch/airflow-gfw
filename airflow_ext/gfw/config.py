@@ -57,17 +57,16 @@ def failure_callback_gfw(context):
     :param context: The context of the executed task.
     :type context: dict
     """
+    ti = context['task_instance']
     message = ':red_circle: TASK FAILS:\n' \
               'DAG:    {}\n' \
               'TASKS:  {}\n' \
               'Log-URL: {}\n' \
               'Reason: {}\n' \
-              'Context: {}\n' \
-        .format(context['task_instance'].dag_id,
-                context['task_instance'].task_id,
-                context['task_instance'].log_url,
-                context['exception'],
-                context)
+        .format(ti.dag_id,
+                ti.task_id,
+                ti.log_url,
+                context['exception'])
 
     slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
 
