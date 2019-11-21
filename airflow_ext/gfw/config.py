@@ -45,10 +45,6 @@ def pipeline_end_date(config):
 
 
 SLACK_CONN_ID = 'slack_on_failure'
-# Create an Airflow connection for Slack with HTTP connection and the part after https://hooks.slack.com/services should go under password:
-# Host: https://hooks.slack.com/services
-# Conn Type: HTTP
-# Password: /T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
 
 def failure_callback_gfw(context):
     """
@@ -76,7 +72,6 @@ def failure_callback_gfw(context):
         webhook_token=slack_webhook_token,
         message=message,
         username='airflow',
-        icon_emoji=':hankey',
         icon_url='https://airflow.apache.org/_images/pin_large.png',
         link_names=True
     ).execute(context)
