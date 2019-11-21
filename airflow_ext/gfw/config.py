@@ -1,8 +1,11 @@
+from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
+from airflow.hooks.base_hook import BaseHook
+from airflow.models import Variable
+
 from datetime import datetime
 from datetime import timedelta
-import math
 
-from airflow.models import Variable
+import math
 
 
 CONNECTION_ID = 'google_cloud_default'
@@ -41,8 +44,40 @@ def pipeline_end_date(config):
         return None
 
 
-INITIAL_RETRY_DELAY = 2 * 60
+SLACK_CONN_ID = 'slack_on_failure'
 
+def failure_callback_gfw(context):
+    """
+    The function that will be executed on failure.
+
+    :param context: The context of the executed task.
+    :type context: dict
+    """
+    ti = context['task_instance']
+    message = ':red_circle: TASK FAILS:\n' \
+              'DAG:    {}\n' \
+              'TASKS:  {}\n' \
+              'Log-URL: {}\n' \
+              'Reason: {}\n' \
+        .format(ti.dag_id,
+                ti.task_id,
+                ti.log_url,
+                context['exception'])
+
+    slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
+
+    return SlackWebhookOperator(
+        task_id='on_task_failure',
+        http_conn_id=SLACK_CONN_ID,
+        webhook_token=slack_webhook_token,
+        message=message,
+        username='airflow',
+        icon_url='https://airflow.apache.org/_images/pin_large.png',
+        link_names=True
+    ).execute(context)
+
+
+INITIAL_RETRY_DELAY = 2 * 60
 
 def default_args(config):
     args = {
@@ -67,6 +102,7 @@ def default_args(config):
         'google_cloud_conn_id': CONNECTION_ID,
         'write_disposition': 'WRITE_TRUNCATE',
         'allow_large_results': True,
+        'on_failure_callback': failure_callback_gfw,
     }
 
     return args
