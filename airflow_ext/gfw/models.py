@@ -79,7 +79,7 @@ class DagFactory(object):
             table_id=self.format_date_sharded_table(table, date),
             poke_interval=10,  # check every 10 seconds for a minute
             timeout=60,
-            retries=24 * 7,  # retry once per hour for a week
+            retries=24,  # retry once per hour for a day
             retry_delay=timedelta(minutes=60),
             retry_exponential_backoff=False
         )

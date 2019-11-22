@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v0.0.4 - 2019-11-22
+
+### Changed
+
+  * [#1160](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1160): Changes
+    the retry period from 168 to 24 attemps to mark quickly a task that fails.
+
 ## v0.0.3 - 2019-11-21
 
 ### Changed
