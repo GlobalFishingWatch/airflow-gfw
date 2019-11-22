@@ -77,11 +77,10 @@ class DagFactory(object):
             project_id=project,
             dataset_id=dataset,
             table_id=self.format_date_sharded_table(table, date),
-            poke_interval=10,  # check every 10 seconds for a minute
-            timeout=60,
-            retries=24,  # retry once per hour for a day
-            retry_delay=timedelta(minutes=60),
-            retry_exponential_backoff=False
+            mode='reschedule',      # the sensor task frees the worker slot when the criteria is not yet met
+                                    # and it's rescheduled at a later time.
+            poke_interval=10 * 60,  # check every 10 minutes.
+            timeout=60 * 60 * 24    # timeout of 24 hours.
         )
 
     def source_table_sensors(self, dag):

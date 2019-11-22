@@ -13,7 +13,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 
   * [#1160](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1160): Changes
-    the retry period from 168 to 24 attemps to mark quickly a task that fails.
+    on how the sensor of tables operates:
+    * Uses mode reschedule, the sensor will free the work slot.
+    * Increases the poke interval to 10 minutes.
+    * Increases the timeout to 24hs.
+
+### Removed
+
+  * [#1160](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1160): Removes
+    the `retries` parameter, `retry_delay`, `retry_exponential_backoff`.
 
 ## v0.0.3 - 2019-11-21
 
