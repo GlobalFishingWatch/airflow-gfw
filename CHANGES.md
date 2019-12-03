@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v0.0.5 - 2019-12-03
+
+### Added
+
+  * [#1164](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1164): Added
+    gcs sensor on model of DAG for airflow-gfw.
+
 ## v0.0.4 - 2019-11-22
 
 ### Changed

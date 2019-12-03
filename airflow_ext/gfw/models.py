@@ -1,7 +1,9 @@
-from datetime import timedelta
-
-from airflow_ext.gfw import config as config_tools
 from airflow.contrib.sensors.bigquery_sensor import BigQueryTableSensor
+from airflow_ext.gfw import config as config_tools
+from airflow_ext.gfw.sensors.gcs_sensor import GoogleCloudStoragePrefixSensor
+
+from datetime import timedelta
+import re
 
 
 class DagFactory(object):
@@ -88,6 +90,52 @@ class DagFactory(object):
             self.table_sensor(dag=dag, task_id='source_exists_{}'.format(
                 parts['table']), **parts)
             for parts in self.source_table_parts(date=self.source_sensor_date_nodash())
+        ]
+
+    def gcs_sensor(self, dag, bucket, prefix, date):
+        return GoogleCloudStoragePrefixSensor(
+            dag=dag,
+            task_id='source_exists_{}'.format(bucket),
+            bucket=bucket,
+            prefix='{}/{}'.format(prefix, date),
+            mode='reschedule',      # the sensor task frees the worker slot when the criteria is not yet met
+                                    # and it's rescheduled at a later time.
+            poke_interval=10 * 60,  # check every 10 minutes.
+            timeout=60 * 60 * 24    # timeout of 24 hours.
+        )
+
+    def source_path(self, date=None):
+        gcs_paths = self.config.get('source_paths') or self.config.get('source_path')
+        assert gcs_paths
+        paths = gcs_paths.split(',')
+        gcs=None
+        tables=None
+
+        for path in paths:
+            if (path.strip().startswith('gs://')):
+                gcs = yield dict(
+                    bucket=re.search('(?<=gs://)[^/]*', path).group(0),
+                    prefix=re.search('(?<=gs://)[^/]*/(.*)', path).group(1),
+                    date=self.source_date_range()[1] if not date else date
+                )
+            else:
+                tables = yield dict(
+                    project=self.config['project_id'],
+                    dataset=self.config['source_dataset'],
+                    table=path,
+                    date=self.source_sensor_date_nodash()
+                )
+        [gcs, tables]
+
+    def source_sensors(self, dag, date=None):
+        return [
+            self.gcs_sensor(dag=dag, **parts) if ('bucket' in parts and 'prefix' in parts)
+            else self.table_sensor(
+                    dag=dag,
+                    task_id='source_exists_{}'.format( parts['table']),
+                    **parts
+            )
+            for parts in self.source_path(date)
         ]
 
     def build(self, dag_id):
