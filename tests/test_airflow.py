@@ -69,7 +69,7 @@ def dag_factory_sources(airflow_init_db):
     class _Test_DagFactory(DagFactory):
         def build(self, dag_id):
             with DAG(dag_id, default_args=self.default_args, schedule_interval=self.schedule_interval) as dag:
-                for sensor in self.source_sensors(dag):
+                for sensor in self.source_gcs_sensors(dag):
                     dag >> sensor
             return dag
 
@@ -230,7 +230,7 @@ class TestAirflow:
     ])
     def test_sources(self, key, expected, dag_factory_sources, dag_config):
         base_config = {
-            'source_paths': 'fishery,gs://scratch_matias/testing/test2,events,gs://vms-gfw/real-time-naf/test'
+            'source_gcs_paths': 'fishery,gs://scratch_matias/testing/test2,events,gs://vms-gfw/real-time-naf/test'
         }
 
         factory = dag_factory_sources(

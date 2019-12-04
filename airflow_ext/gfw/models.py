@@ -93,6 +93,18 @@ class DagFactory(object):
         ]
 
     def gcs_sensor(self, dag, bucket, prefix, date):
+        """
+        Returns the GoogleCloudStoragePreixSensor customized for the parameters.
+
+        :param dag: The DAG which will be associated with the sensor.
+        :type dag: DAG from Airflow.
+        :param bucket: The bucket of GCS where to sensor.
+        :type bucket: str
+        :param prefix: The prefix after the bucket id of GCS where to sensor.
+        :type prefix: str
+        :param date: The date that defines the folder in GCS to be checked.
+        :type date: str
+        """
         return GoogleCloudStoragePrefixSensor(
             dag=dag,
             task_id='source_exists_{}'.format(bucket),
@@ -104,12 +116,17 @@ class DagFactory(object):
             timeout=60 * 60 * 24    # timeout of 24 hours.
         )
 
-    def source_path(self, date=None):
-        gcs_paths = self.config.get('source_paths') or self.config.get('source_path')
+    def source_gcs_path(self, date=None):
+        """
+        Returns a generator with bucket, prefix and date if the paths matched the GCS protocol, None in other way.
+
+        :param date: The date that defines the folder in GCS to be checked.
+        :type date: str
+        """
+        gcs_paths = self.config.get('source_gcs_paths') or self.config.get('source_gcs_path')
         assert gcs_paths
         paths = gcs_paths.split(',')
         gcs=None
-        tables=None
 
         for path in paths:
             if (path.strip().startswith('gs://')):
@@ -118,25 +135,20 @@ class DagFactory(object):
                     prefix=re.search('(?<=gs://)[^/]*/(.*)', path).group(1),
                     date=self.source_date_range()[1] if not date else date
                 )
-            else:
-                tables = yield dict(
-                    project=self.config['project_id'],
-                    dataset=self.config['source_dataset'],
-                    table=path,
-                    date=self.source_sensor_date_nodash()
-                )
-        [gcs, tables]
+        gcs
 
-    def source_sensors(self, dag, date=None):
-        return [
-            self.gcs_sensor(dag=dag, **parts) if ('bucket' in parts and 'prefix' in parts)
-            else self.table_sensor(
-                    dag=dag,
-                    task_id='source_exists_{}'.format( parts['table']),
-                    **parts
-            )
-            for parts in self.source_path(date)
-        ]
+    def source_gcs_sensors(self, dag, date=None):
+        """
+        Returns an array of GCS sensors operators related with the DAG and an specific date if it is defined.
+
+        Iterates over the dict generated of GCS PATHS to define the operator to check its existance.
+
+        :param dag: The DAG which will be associated with the sensor.
+        :type dag: DAG from Airflow.
+        :param date: The date that defines the folder in GCS to be checked.
+        :type date: str
+        """
+        return [ self.gcs_sensor(dag=dag, **parts) for parts in self.source_gcs_path(date) ]
 
     def build(self, dag_id):
         raise NotImplementedError
