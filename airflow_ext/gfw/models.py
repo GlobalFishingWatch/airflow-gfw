@@ -1,8 +1,12 @@
 from airflow.contrib.sensors.bigquery_sensor import BigQueryTableSensor
+from airflow.models import Variable
+
 from airflow_ext.gfw import config as config_tools
+from airflow_ext.gfw.operators.helper.flexible_operator import FlexibleOperator
 from airflow_ext.gfw.sensors.gcs_sensor import GoogleCloudStoragePrefixSensor
 
 from datetime import timedelta
+
 import re
 
 
@@ -19,6 +23,26 @@ class DagFactory(object):
         self.default_args.update(extra_default_args)
 
         self.schedule_interval = schedule_interval
+
+        self.flexible_operator = Variable.get('FLEXIBLE_OPERATOR')
+
+    def build_docker_task(self, params):
+        """Creates a new airflow task which executes a docker container
+
+        This method returns a new airflow operator instance which is configured
+        to execute a docker container. It works similar to instantiating a
+        `KubernetesPodOperator` and supports the same arguments, but internally
+        decides on how to best run the container based on the environment. For
+        example, when running inside Google Cloud Composer, or inside a
+        `pipe-airflow` instance running in a kubernetes cluster, this method
+        returns a `KubernetesPodOperator`, but when running in a local airflow
+        instance it returns a `BashOperator` set up to run the docker container
+        locally.
+
+        This behavior is controlled by the `FLEXIBLE_OPERATOR` airflow
+        variable, which may be either `bash` or `kubernetes`.
+        """
+        FlexibleOperator(params).build_operator(self.flexible_operator)
 
     def source_sensor_date_nodash(self):
         if self.schedule_interval == '@daily':
