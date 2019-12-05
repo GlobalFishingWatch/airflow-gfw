@@ -2,7 +2,7 @@ from airflow.contrib.sensors.bigquery_sensor import BigQueryTableSensor
 from airflow.models import Variable
 
 from airflow_ext.gfw import config as config_tools
-from airflow_ext.gfw.operators.helper import FlexibleOperator
+from airflow_ext.gfw.operators.helper.flexible_operator import FlexibleOperator
 from airflow_ext.gfw.sensors.gcs_sensor import GoogleCloudStoragePrefixSensor
 
 from datetime import timedelta

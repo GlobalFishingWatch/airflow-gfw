@@ -50,6 +50,7 @@ def dag_config(airflow_init_db):
         foo='bar',
     )
     Variable.set(variable_name, value, serialize_json=True)
+    Variable.set('FLEXIBLE_OPERATOR', 'bash', serialize_json=True)
     return variable_name
 
 
