@@ -1,7 +1,13 @@
-from datetime import timedelta
+from airflow.contrib.sensors.bigquery_sensor import BigQueryTableSensor
+from airflow.models import Variable
 
 from airflow_ext.gfw import config as config_tools
-from airflow.contrib.sensors.bigquery_sensor import BigQueryTableSensor
+from airflow_ext.gfw.operators.helper.flexible_operator import FlexibleOperator
+from airflow_ext.gfw.sensors.gcs_sensor import GoogleCloudStoragePrefixSensor
+
+from datetime import timedelta
+
+import re
 
 
 class DagFactory(object):
@@ -17,6 +23,26 @@ class DagFactory(object):
         self.default_args.update(extra_default_args)
 
         self.schedule_interval = schedule_interval
+
+        self.flexible_operator = Variable.get('FLEXIBLE_OPERATOR')
+
+    def build_docker_task(self, params):
+        """Creates a new airflow task which executes a docker container
+
+        This method returns a new airflow operator instance which is configured
+        to execute a docker container. It works similar to instantiating a
+        `KubernetesPodOperator` and supports the same arguments, but internally
+        decides on how to best run the container based on the environment. For
+        example, when running inside Google Cloud Composer, or inside a
+        `pipe-airflow` instance running in a kubernetes cluster, this method
+        returns a `KubernetesPodOperator`, but when running in a local airflow
+        instance it returns a `BashOperator` set up to run the docker container
+        locally.
+
+        This behavior is controlled by the `FLEXIBLE_OPERATOR` airflow
+        variable, which may be either `bash` or `kubernetes`.
+        """
+        FlexibleOperator(params).build_operator(self.flexible_operator)
 
     def source_sensor_date_nodash(self):
         if self.schedule_interval == '@daily':
@@ -89,6 +115,64 @@ class DagFactory(object):
                 parts['table']), **parts)
             for parts in self.source_table_parts(date=self.source_sensor_date_nodash())
         ]
+
+    def gcs_sensor(self, dag, bucket, prefix, date):
+        """
+        Returns the GoogleCloudStoragePreixSensor customized for the parameters.
+
+        :param dag: The DAG which will be associated with the sensor.
+        :type dag: DAG from Airflow.
+        :param bucket: The bucket of GCS where to sensor.
+        :type bucket: str
+        :param prefix: The prefix after the bucket id of GCS where to sensor.
+        :type prefix: str
+        :param date: The date that defines the folder in GCS to be checked.
+        :type date: str
+        """
+        return GoogleCloudStoragePrefixSensor(
+            dag=dag,
+            task_id='source_exists_{}'.format(bucket),
+            bucket=bucket,
+            prefix='{}/{}'.format(prefix, date),
+            mode='reschedule',      # the sensor task frees the worker slot when the criteria is not yet met
+                                    # and it's rescheduled at a later time.
+            poke_interval=10 * 60,  # check every 10 minutes.
+            timeout=60 * 60 * 24    # timeout of 24 hours.
+        )
+
+    def source_gcs_path(self, date=None):
+        """
+        Returns a generator with bucket, prefix and date if the paths matched the GCS protocol, None in other way.
+
+        :param date: The date that defines the folder in GCS to be checked.
+        :type date: str
+        """
+        gcs_paths = self.config.get('source_gcs_paths') or self.config.get('source_gcs_path')
+        assert gcs_paths
+        paths = gcs_paths.split(',')
+        gcs=None
+
+        for path in paths:
+            if (path.strip().startswith('gs://')):
+                gcs = yield dict(
+                    bucket=re.search('(?<=gs://)[^/]*', path).group(0),
+                    prefix=re.search('(?<=gs://)[^/]*/(.*)', path).group(1),
+                    date=self.source_date_range()[1] if not date else date
+                )
+        gcs
+
+    def source_gcs_sensors(self, dag, date=None):
+        """
+        Returns an array of GCS sensors operators related with the DAG and an specific date if it is defined.
+
+        Iterates over the dict generated of GCS PATHS to define the operator to check its existance.
+
+        :param dag: The DAG which will be associated with the sensor.
+        :type dag: DAG from Airflow.
+        :param date: The date that defines the folder in GCS to be checked.
+        :type date: str
+        """
+        return [ self.gcs_sensor(dag=dag, **parts) for parts in self.source_gcs_path(date) ]
 
     def build(self, dag_id):
         raise NotImplementedError

@@ -1,4 +1,5 @@
 from airflow import configuration, DAG
+from airflow.contrib.sensors.bigquery_sensor import BigQueryTableSensor
 from airflow.models import Variable
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
@@ -7,9 +8,11 @@ from airflow.utils.state import State
 from airflow.utils.timezone import datetime
 from airflow.utils.timezone import utcnow
 
+from airflow_ext.gfw import config as config_tools
 from airflow_ext.gfw.models import DagFactory
 from airflow_ext.gfw.operators.dataflow_operator import DataFlowDirectRunnerOperator
 from airflow_ext.gfw.operators.python_operator import ExecutionDateBranchOperator
+from airflow_ext.gfw.sensors.gcs_sensor import GoogleCloudStoragePrefixSensor
 
 from datetime import timedelta
 import os
@@ -43,9 +46,11 @@ def dag_config(airflow_init_db):
         project_id='test_project',
         pipeline_dataset='dataset',
         pipeline_bucket='bucket',
+        source_dataset='dataset_source',
         foo='bar',
     )
     Variable.set(variable_name, value, serialize_json=True)
+    Variable.set('FLEXIBLE_OPERATOR', 'bash', serialize_json=True)
     return variable_name
 
 
@@ -56,6 +61,17 @@ def dag_factory(airflow_init_db):
             with DAG('airflow_test_dag', default_args=self.default_args, schedule_interval=self.schedule_interval) as dag:
                 op = DummyOperator(task_id='dummy')
                 dag >> op
+            return dag
+
+    return _Test_DagFactory
+
+@pytest.fixture(scope='function')
+def dag_factory_sources(airflow_init_db):
+    class _Test_DagFactory(DagFactory):
+        def build(self, dag_id):
+            with DAG(dag_id, default_args=self.default_args, schedule_interval=self.schedule_interval) as dag:
+                for sensor in self.source_gcs_sensors(dag):
+                    dag >> sensor
             return dag
 
     return _Test_DagFactory
@@ -192,3 +208,34 @@ class TestAirflow:
             dag=dag
         )
         task.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+
+
+    @pytest.mark.parametrize("key,expected", [
+        # Generated config entries
+        ('ds', '2018-01-01'),
+        ('ds_nodash', '20180101'),
+        ('first_day_of_month', '2018-01-01'),
+        ('last_day_of_month', '2018-01-31'),
+        ('first_day_of_month_nodash', '20180101'),
+        ('last_day_of_month_nodash', '20180131'),
+        ('first_day_of_year', '2018-01-01'),
+        ('last_day_of_year', '2018-12-31'),
+        ('first_day_of_year_nodash', '20180101'),
+        ('last_day_of_year_nodash', '20181231'),
+
+        # Config entries stored in the database
+        ('project_id', 'test_project'),
+        ('pipeline_dataset', 'dataset'),
+        ('pipeline_bucket', 'bucket'),
+        ('source_dataset', 'dataset_source'),
+    ])
+    def test_sources(self, key, expected, dag_factory_sources, dag_config):
+        base_config = {
+            'source_gcs_paths': 'fishery,gs://scratch_matias/testing/test2,events,gs://vms-gfw/real-time-naf/test'
+        }
+
+        factory = dag_factory_sources(
+            pipeline=dag_config,
+            base_config=base_config)
+
+        dag = factory.build('config_test_dag')
