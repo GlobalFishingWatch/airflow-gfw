@@ -8,7 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## v0.0.5 - 2019-12-03
+## v0.0.5 - 2019-12-05
 
 ### Added
 
