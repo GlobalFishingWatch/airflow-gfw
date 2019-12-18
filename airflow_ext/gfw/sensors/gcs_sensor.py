@@ -22,6 +22,9 @@ class GoogleCloudStoragePrefixSensor(BaseSensorOperator):
             *args,
             **kwargs):
 
+        print "===============================VER=================="
+        print args
+        print kwargs
         super(GoogleCloudStoragePrefixSensor, self).__init__(*args, **kwargs)
         self.bucket = bucket
         self.prefix = prefix
