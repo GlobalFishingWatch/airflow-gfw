@@ -134,10 +134,12 @@ class DagFactory(object):
             task_id='source_exists_{}'.format(bucket),
             bucket=bucket,
             prefix='{}/{}'.format(prefix, date),
-            mode='reschedule',      # the sensor task frees the worker slot when the criteria is not yet met
-                                    # and it's rescheduled at a later time.
-            poke_interval=10 * 60,  # check every 10 minutes.
-            timeout=60 * 60 * 24    # timeout of 24 hours.
+            mode='reschedule',               # the sensor task frees the worker slot when the criteria is not yet met
+                                             # and it's rescheduled at a later time.
+            poke_interval=10 * 60,           # check every 10 minutes.
+            timeout=60 * 60 * 24,            # timeout of 24 hours.
+            retry_exponential_backoff=False, # disable progressive longer waits
+            retries=0                        # no retries and lets fail the task
         )
 
     def source_gcs_path(self, date=None):

@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v0.0.6 - 2019-12-19
+
+### Changed
+
+  * [#1164](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1164): Changes
+    turninng off the retries process for gcs_sensor.
+
 ## v0.0.5 - 2019-12-05
 
 ### Added
