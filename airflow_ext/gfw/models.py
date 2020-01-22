@@ -42,7 +42,7 @@ class DagFactory(object):
         This behavior is controlled by the `FLEXIBLE_OPERATOR` airflow
         variable, which may be either `bash` or `kubernetes`.
         """
-        FlexibleOperator(params).build_operator(self.flexible_operator)
+        return FlexibleOperator(params).build_operator(self.flexible_operator)
 
     def source_sensor_date_nodash(self):
         if self.schedule_interval == '@daily':
