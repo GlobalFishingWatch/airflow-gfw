@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v0.0.7 - 2020-01-22
+
+### Added
+
+  * [#1178](https://github.com/GlobalFishingWatch/GFW-Tasks/issues/1178): Adds
+    missing return of the FlexibleOperator operator.
+
 ## v0.0.6 - 2019-12-19
 
 ### Changed
