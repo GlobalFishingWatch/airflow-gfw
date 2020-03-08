@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.7
 
 # Airflow GPL dependency
 ENV SLUGIFY_USES_TEXT_UNIDECODE=yes
