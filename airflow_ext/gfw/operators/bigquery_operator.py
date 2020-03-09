@@ -1,6 +1,6 @@
 import json
 import logging
-from urllib2 import HTTPError
+from urllib.error import HTTPError
 
 from airflow.contrib.hooks.bigquery_hook import BigQueryHook, BigQueryCursor
 from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
