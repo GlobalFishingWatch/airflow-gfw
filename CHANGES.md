@@ -14,7 +14,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
   * [GlobalFishingWatch/gfw-eng-tasks#23](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/23): Adds
     support of python 3.7
-    date branch operator.
 
 ## v0.0.7 - 2020-01-22
 
