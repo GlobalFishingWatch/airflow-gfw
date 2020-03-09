@@ -3,7 +3,7 @@ Airflow extension for GFW pipelines.
 """
 
 
-__version__ = '0.0.8'
+__version__ = '1.0.0'
 __author__ = 'Matias Piano'
 __email__ = 'matias@globalfishingwatch.org'
 __source__ = 'https://github.com/GlobalFishingWatch/airflow-gfw'
