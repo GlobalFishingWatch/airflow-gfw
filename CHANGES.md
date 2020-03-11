@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v1.0.0 - 2020-03-09
+
+### Added
+
+  * [GlobalFishingWatch/gfw-eng-tasks#23](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/23): Adds
+    support of python 3.7
+
 ## v0.0.7 - 2020-01-22
 
 ### Added
