@@ -17,7 +17,7 @@ class DataFlowDirectRunnerHook(DataFlowHook):
     def _build_cmd(self, task_id, variables, dataflow):
         command = [dataflow]
         if variables is not None:
-            for attr, value in variables.iteritems():
+            for attr, value in list(variables.items()):
                 command.append("--" + attr + "=" + value)
         return command
 

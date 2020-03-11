@@ -14,5 +14,5 @@ class TestTimestampTools():
         now = datetime.now(tz=pytz.UTC)
         yesterday=now - timedelta(days=1)
         gen=daterange(yesterday, now)
-        assert gen.next() == yesterday
-        assert gen.next() == now
+        assert next(gen) == yesterday
+        assert next(gen) == now

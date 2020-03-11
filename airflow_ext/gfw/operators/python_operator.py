@@ -3,7 +3,7 @@ from airflow.utils.decorators import apply_defaults
 
 
 def branch_on_execution_date(**kwargs):
-    print kwargs
+    print(kwargs)
     dt = kwargs['execution_date']
     for d1, d2, task in kwargs['branches']:
         if (d1 is None or dt >= d1) and (d2 is None or dt <= d2):

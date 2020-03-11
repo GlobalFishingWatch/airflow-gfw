@@ -28,7 +28,7 @@ class FlexibleOperator:
                 ' '.join(arguments))
             # Left only the extra parameters that are not the bash_command
             extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'arguments','image','docker_run','name','dag'})) }
-            logging.debug('Running BashOperator(commands={}, {})'.format(commands, ', '.join(['{0}={1}'.format(k,v) for k,v in extra_params.iteritems()])))
+            logging.debug('Running BashOperator(commands={}, {})'.format(commands, ', '.join(['{0}={1}'.format(k,v) for k,v in list(extra_params.items())])))
             operator = BashOperator(
                 bash_command = commands,
                 **extra_params
@@ -39,7 +39,7 @@ class FlexibleOperator:
             self.operator_parameters.update(get_logs=True, in_cluster=True)
             # Left only the extra parameters that are not the kubernetes_command
             extra_params = { k : self.operator_parameters[k] for k in set(self.operator_parameters) - set(dict.fromkeys({'image','docker_run','name'})) }
-            logging.debug('Running KubernetesPodOperator(namespace={}, image={}, name={}, {})'.format(os.getenv('K8_NAMESPACE'), self.operator_parameters['image'], self.operator_parameters['name'], ', '.join(['{0}={1}'.format(k,v) for k,v in extra_params.iteritems()])))
+            logging.debug('Running KubernetesPodOperator(namespace={}, image={}, name={}, {})'.format(os.getenv('K8_NAMESPACE'), self.operator_parameters['image'], self.operator_parameters['name'], ', '.join(['{0}={1}'.format(k,v) for k,v in list(extra_params.items())])))
             operator = KubernetesPodOperator(
                 namespace = os.getenv('K8_NAMESPACE'),
                 image = self.operator_parameters['image'],
