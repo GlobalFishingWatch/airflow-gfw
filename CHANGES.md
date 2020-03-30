@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v0.0.7-HOTFIX1 - 2020-03-30
+
+### Added
+
+  * [GlobalFishingWatch/gfw-eng-tasks#42](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/42): Adds
+    gcs sensor flexibility to adjust timeout and retries.
+
 ## v0.0.7 - 2020-01-22
 
 ### Added
