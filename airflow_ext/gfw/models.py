@@ -116,7 +116,7 @@ class DagFactory(object):
             for parts in self.source_table_parts(date=self.source_sensor_date_nodash())
         ]
 
-    def gcs_sensor(self, dag, bucket, prefix, date):
+    def gcs_sensor(self, dag, bucket, prefix, date, retries, timeout):
         """
         Returns the GoogleCloudStoragePreixSensor customized for the parameters.
 
@@ -128,26 +128,31 @@ class DagFactory(object):
         :type prefix: str
         :param date: The date that defines the folder in GCS to be checked.
         :type date: str
+        :param retries: The amount of retries before fails.
+        :type retries: int
+        :param timeout: The timeout to sense the GCS.
+        :type timeout: int
         """
         return GoogleCloudStoragePrefixSensor(
             dag=dag,
             task_id='source_exists_{}'.format(bucket),
             bucket=bucket,
             prefix='{}/{}'.format(prefix, date),
-            mode='reschedule',               # the sensor task frees the worker slot when the criteria is not yet met
-                                             # and it's rescheduled at a later time.
-            poke_interval=10 * 60,           # check every 10 minutes.
-            timeout=60 * 60 * 24,            # timeout of 24 hours.
-            retry_exponential_backoff=False, # disable progressive longer waits
-            retries=0                        # no retries and lets fail the task
+            mode='reschedule',                                # the sensor task frees the worker slot
+                                                              # when the criteria is not yet met
+                                                              # and it's rescheduled at a later time.
+            poke_interval=10 * 60,                            # check every 10 minutes.
+            timeout=60 * 60 * 24 if not timeout else timeout, # timeout of 24 hours.
+            retry_exponential_backoff=False,                  # disable progressive longer waits
+            retries=0 if not retries else retries             # amount of retries and lets fail the task
         )
 
-    def source_gcs_path(self, date=None):
+    def source_gcs_path(self, **sensor_args):
         """
         Returns a generator with bucket, prefix and date if the paths matched the GCS protocol, None in other way.
 
-        :param date: The date that defines the folder in GCS to be checked.
-        :type date: str
+        :param sensor_args: A dict that defines the sensor paramters in GCS to be checked.
+        :type sensor_args: dict
         """
         gcs_paths = self.config.get('source_gcs_paths') or self.config.get('source_gcs_path')
         assert gcs_paths
@@ -159,11 +164,13 @@ class DagFactory(object):
                 gcs = yield dict(
                     bucket=re.search('(?<=gs://)[^/]*', path).group(0),
                     prefix=re.search('(?<=gs://)[^/]*/(.*)', path).group(1),
-                    date=self.source_date_range()[1] if not date else date
+                    date=self.source_date_range()[1] if not sensor_args.get('date') else sensor_args.get('date'),
+                    retries=sensor_args.get('retries'),
+                    timeout=sensor_args.get('timeout')
                 )
         gcs
 
-    def source_gcs_sensors(self, dag, date=None):
+    def source_gcs_sensors(self, dag, **sensor_args):
         """
         Returns an array of GCS sensors operators related with the DAG and an specific date if it is defined.
 
@@ -171,10 +178,10 @@ class DagFactory(object):
 
         :param dag: The DAG which will be associated with the sensor.
         :type dag: DAG from Airflow.
-        :param date: The date that defines the folder in GCS to be checked.
-        :type date: str
+        :param sensor_args: A dict that defines the sensor paramters in GCS to be checked.
+        :type sensor_args: dict
         """
-        return [ self.gcs_sensor(dag=dag, **parts) for parts in self.source_gcs_path(date) ]
+        return [ self.gcs_sensor(dag=dag, **parts) for parts in self.source_gcs_path(**sensor_args) ]
 
     def build(self, dag_id):
         raise NotImplementedError
