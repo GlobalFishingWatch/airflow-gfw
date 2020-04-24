@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v1.0.2 - 2020-04-24
+
+### Changed
+
+  * [GlobalFishingWatch/gfw-eng-tasks#51](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/51): Changes
+    use of Apache Airflow from `1.10.5` to `1.10.10`.
+
 ## v1.0.1 - 2020-03-31
 
 ### Added
