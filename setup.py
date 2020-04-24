@@ -12,7 +12,7 @@ from setuptools import setup
 
 
 DEPENDENCIES = [
-    "apache-airflow==1.10.5",
+    "apache-airflow==1.10.10",
     "cryptography",
     "funcsigs==1.0.0",
     "kubernetes==8.0.1",
