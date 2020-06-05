@@ -182,7 +182,7 @@ class DagFactory(object):
         """
         return [ self.gcs_sensor(dag=dag, **parts) for parts in self.source_gcs_path(**sensor_args) ]
 
-    def table_check(self, task_id, project, dataset, table, date, **retries_config=None):
+    def table_check(self, task_id, project, dataset, table, date, **retries_config):
         """
         Returns a BigQueryCheckOperator that checks the existance of a partitioned table for a specific date.
         Having a retry mechanism of 3 days checking by 30 minutes.
