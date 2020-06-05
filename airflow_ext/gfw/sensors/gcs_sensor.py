@@ -1,4 +1,4 @@
-from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
+from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.sensors.base_sensor_operator import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 
@@ -30,7 +30,7 @@ class GoogleCloudStoragePrefixSensor(BaseSensorOperator):
 
     def poke(self, context):
         self.log.info('Sensor checks existence of: <gs://%s/%s>', self.bucket, self.prefix)
-        hook = GoogleCloudStorageHook(
+        hook = GCSHook(
             google_cloud_storage_conn_id=self.google_cloud_conn_id,
             delegate_to=self.delegate_to)
         return len(hook.list(self.bucket, prefix=self.prefix)) > 0

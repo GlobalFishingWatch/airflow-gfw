@@ -1,4 +1,4 @@
-from airflow.operators.python_operator import BranchPythonOperator
+from airflow.operators.python import BranchPythonOperator
 from airflow.utils.decorators import apply_defaults
 
 
