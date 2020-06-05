@@ -203,8 +203,8 @@ class DagFactory(object):
         """
         retries = retries_config.get('retries')
         execution_timeout = retries_config.get('execution_timeout')
-        retry_delay = retry_delay_config.get('retry_delay')
-        max_retry_delay = max_retry_delay_config.get('max_retry_delay')
+        retry_delay = retries_config.get('retry_delay')
+        max_retry_delay = retries_config.get('max_retry_delay')
         return BigQueryCheckOperator(
             task_id=task_id,
             project_id=project,
