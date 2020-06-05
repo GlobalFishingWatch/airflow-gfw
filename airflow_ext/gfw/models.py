@@ -224,7 +224,7 @@ class DagFactory(object):
         :type tables_check_args: dict
         """
         return [
-            self.table_check(task_id='check_existance_{}'.format(parts['table']), **parts)
+            self.table_check(task_id='check_existence_{}'.format(parts['table']), **parts)
             for parts in
             self.source_table_parts(
                 self.config.get('check_tables') or
