@@ -1,13 +1,14 @@
-import json
-import logging
-from urllib.error import HTTPError
-
-from airflow.contrib.hooks.bigquery_hook import BigQueryHook, BigQueryCursor
-from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
+from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook, BigQueryCursor
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
+
 from airflow_ext.gfw.operators.timestamp import daterange, str2date
+
+from urllib.error import HTTPError
+
+import json
+import logging
 
 
 class BigQueryCreateEmptyTableOperator(BaseOperator):

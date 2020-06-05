@@ -1,7 +1,7 @@
-from airflow.contrib.hooks.gcp_dataflow_hook import DataFlowHook
-from airflow.contrib.hooks.gcp_dataflow_hook import _Dataflow
-from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
-from airflow.contrib.operators.dataflow_operator import GoogleCloudBucketHelper
+from airflow.providers.google.cloud.hooks.dataflow import DataFlowHook
+from airflow.providers.google.cloud.hooks.dataflow import _Dataflow
+from airflow.providers.google.cloud.operators.dataflow import DataflowCreatePythonJobOperator
+from airflow.providers.google.cloud.operators.dataflow import GoogleCloudBucketHelper
 from airflow.models.pool import Pool
 from airflow.utils.decorators import apply_defaults
 
@@ -22,7 +22,7 @@ class DataFlowDirectRunnerHook(DataFlowHook):
         return command
 
 
-class DataFlowDirectRunnerOperator(DataFlowPythonOperator):
+class DataFlowDirectRunnerOperator(DataflowCreatePythonJobOperator):
 
     @apply_defaults
     def __init__(self, *args, **kwargs):

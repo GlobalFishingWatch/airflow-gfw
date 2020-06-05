@@ -8,6 +8,19 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v1.0.3 - 2020-06-05
+
+### Added
+
+  * [GlobalFishingWatch/gfw-eng-tasks#105](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/105): Adds
+    * table partition check when using `check_tables` or `check_table` in Airflow Variables.
+
+### Changed
+
+  * [GlobalFishingWatch/gfw-eng-tasks#105](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/105): Changes
+    * Updates the deprecated modules of Apache Airflow.
+
+
 ## v1.0.2 - 2020-04-24
 
 ### Changed

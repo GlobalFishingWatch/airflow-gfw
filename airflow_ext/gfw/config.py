@@ -1,4 +1,4 @@
-from airflow.contrib.operators.slack_webhook_operator import SlackWebhookOperator
+from airflow.providers.slack.operators.slack_webhook import SlackWebhookOperator
 from airflow.hooks.base_hook import BaseHook
 from airflow.models import Variable
 
