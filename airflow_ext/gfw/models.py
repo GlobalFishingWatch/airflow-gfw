@@ -212,7 +212,7 @@ class DagFactory(object):
             sql='SELECT COUNT(*) FROM [{}.{}${}]'.format(dataset, table, date),
             retries=2*24*3 if not retries else retries,                                          # Retries 3 days with 30 minutes.
             execution_timeout=timedelta(days=3) if not execution_timeout else execution_timeout, # TimeOut of 3 days.
-            retry_delay=timedelta(minutes=30) if not retry_dely else retry_delay,                # Delay in retries 30 minutes.
+            retry_delay=timedelta(minutes=30) if not retry_delay else retry_delay,                # Delay in retries 30 minutes.
             max_retry_delay=timedelta(minutes=30) if not max_retry_delay else max_retry_delay,   # Max Delay in retries 30 minutes
             on_failure_callback=config_tools.failure_callback_gfw
         )
