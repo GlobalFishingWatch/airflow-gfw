@@ -1,4 +1,5 @@
 from airflow.contrib.sensors.bigquery_sensor import BigQueryTableSensor
+from airflow.contrib.operators.bigquery_check_operator import BigQueryCheckOperator
 from airflow.models import Variable
 
 from airflow_ext.gfw import config as config_tools
@@ -72,16 +73,10 @@ class DagFactory(object):
     def format_bigquery_table(self, project, dataset, table, date=None):
         return "{}:{}.{}".format(project, dataset, self.format_date_sharded_table(table, date))
 
-    def source_tables(self):
-        tables = self.config.get(
-            'source_tables') or self.config.get('source_table')
+    def source_table_parts(self, tables, date=None):
         assert tables
-        return tables.split(',')
 
-    def source_table_parts(self, date=None):
-        tables = self.source_tables()
-
-        for table in tables:
+        for table in tables.split(','):
             yield dict(
                 project=self.config['project_id'],
                 dataset=self.config['source_dataset'],
@@ -90,11 +85,10 @@ class DagFactory(object):
             )
 
     def source_table_paths(self, date=None):
-        return [self.format_bigquery_table(**parts) for parts in self.source_table_parts(date=date)]
-
-    def source_table_date_paths(self):
-        return [self.format_bigquery_table(**parts)
-                for parts in self.source_table_parts(date=self.source_sensor_date_nodash())]
+        return [
+            self.format_bigquery_table(**parts) for parts in 
+            self.source_table_parts(self.config.get('source_tables') or self.config.get('source_table'), date=date)
+        ]
 
     def table_sensor(self, dag, task_id, project, dataset, table, date=None):
         return BigQueryTableSensor(
@@ -113,7 +107,12 @@ class DagFactory(object):
         return [
             self.table_sensor(dag=dag, task_id='source_exists_{}'.format(
                 parts['table']), **parts)
-            for parts in self.source_table_parts(date=self.source_sensor_date_nodash())
+            for parts in
+            self.source_table_parts(
+                self.config.get('source_tables') or
+                self.config.get('source_table'),
+                date=self.source_sensor_date_nodash()
+            )
         ]
 
     def gcs_sensor(self, dag, bucket, prefix, date, retries, timeout):
@@ -182,6 +181,57 @@ class DagFactory(object):
         :type sensor_args: dict
         """
         return [ self.gcs_sensor(dag=dag, **parts) for parts in self.source_gcs_path(**sensor_args) ]
+
+    def table_check(self, task_id, project, dataset, table, date, **retries_config):
+        """
+        Returns a BigQueryCheckOperator that checks the existance of a partitioned table for a specific date.
+        Having a retry mechanism of 3 days checking by 30 minutes.
+        :param task_id: The task identification.
+        :type task_id: str
+        :param project: The project where the dataset and table belongs.
+        :type project: str
+        :param dataset: The dataset that has the table.
+        :type dataset: str
+        :param table: The partitioned table.
+        :type table: str
+        :param date: The date of the partition to be checked.
+        :type date: str
+        :param retries_config: The retries configuration to adapt to your
+        needs. You can customize parameters as retries, execution_timeout,
+        retry_delay and max_retry_delay.
+        :type retries_config: dict
+        """
+        retries = retries_config.get('retries')
+        execution_timeout = retries_config.get('execution_timeout')
+        retry_delay = retries_config.get('retry_delay')
+        max_retry_delay = retries_config.get('max_retry_delay')
+        return BigQueryCheckOperator(
+            task_id=task_id,
+            project_id=project,
+            dataset_id=dataset,
+            sql='SELECT COUNT(*) FROM [{}.{}${}]'.format(dataset, table, date),
+            retries=2*24*3 if not retries else retries,                                          # Retries 3 days with 30 minutes.
+            execution_timeout=timedelta(days=3) if not execution_timeout else execution_timeout, # TimeOut of 3 days.
+            retry_delay=timedelta(minutes=30) if not retry_delay else retry_delay,                # Delay in retries 30 minutes.
+            max_retry_delay=timedelta(minutes=30) if not max_retry_delay else max_retry_delay,   # Max Delay in retries 30 minutes
+            on_failure_callback=config_tools.failure_callback_gfw
+        )
+
+    def tables_checker(self, **tables_check_args):
+        """
+        Returns an array of BigQueryCheckOperators of partitioned tables to validate existance.
+        :param tables_check_args: The dict that has the details to configure the check operator.
+        :type tables_check_args: dict
+        """
+        return [
+            self.table_check(task_id='check_existence_{}'.format(parts['table']), **parts)
+            for parts in
+            self.source_table_parts(
+                self.config.get('check_tables') or
+                self.config.get('check_table'),
+                date=self.source_sensor_date_nodash()
+            )
+        ]
 
     def build(self, dag_id):
         raise NotImplementedError
