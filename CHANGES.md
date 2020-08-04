@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v1.0.4 - 2020-08-04
+
+### Removed
+
+  * [GlobalFishingWatch/gfw-eng-tasks#143](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/143): Removes
+    * invalid arguments (`proejct_id` and `dataset_id`) passed to `BigQueryCheckOperator`.
+
 ## v1.0.3 - 2020-06-05
 
 ### Added

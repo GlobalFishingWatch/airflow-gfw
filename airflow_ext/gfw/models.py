@@ -73,7 +73,7 @@ class DagFactory(object):
     def format_bigquery_table(self, project, dataset, table, date=None):
         return "{}:{}.{}".format(project, dataset, self.format_date_sharded_table(table, date))
 
-    def source_table_parts(self, tables, date=None):
+    def source_table_parts(self, tables, date=None, extra_config=dict()):
         assert tables
 
         for table in tables.split(','):
@@ -81,7 +81,8 @@ class DagFactory(object):
                 project=self.config['project_id'],
                 dataset=self.config['source_dataset'],
                 table=table,
-                date=date
+                date=date,
+                **extra_config
             )
 
     def source_table_paths(self, date=None):
@@ -207,12 +208,10 @@ class DagFactory(object):
         max_retry_delay = retries_config.get('max_retry_delay')
         return BigQueryCheckOperator(
             task_id=task_id,
-            project_id=project,
-            dataset_id=dataset,
             sql='SELECT COUNT(*) FROM [{}.{}${}]'.format(dataset, table, date),
             retries=2*24*3 if not retries else retries,                                          # Retries 3 days with 30 minutes.
             execution_timeout=timedelta(days=3) if not execution_timeout else execution_timeout, # TimeOut of 3 days.
-            retry_delay=timedelta(minutes=30) if not retry_delay else retry_delay,                # Delay in retries 30 minutes.
+            retry_delay=timedelta(minutes=30) if not retry_delay else retry_delay,               # Delay in retries 30 minutes.
             max_retry_delay=timedelta(minutes=30) if not max_retry_delay else max_retry_delay,   # Max Delay in retries 30 minutes
             on_failure_callback=config_tools.failure_callback_gfw
         )
@@ -229,7 +228,8 @@ class DagFactory(object):
             self.source_table_parts(
                 self.config.get('check_tables') or
                 self.config.get('check_table'),
-                date=self.source_sensor_date_nodash()
+                date=self.source_sensor_date_nodash(),
+                tables_check_args
             )
         ]
 
