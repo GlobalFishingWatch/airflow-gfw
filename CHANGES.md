@@ -8,19 +8,27 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v1.1.0 - 2020-11-13
+
+### Added
+
+  * [PIPELINE-155](https://globalfishingwatch.atlassian.net/browse/PIPELINE-155):
+    Adds a new method to obtain the nodash version of `source_date_range`,
+    useful when dealing with date-sharded bq inputs
+
 ## v1.0.4 - 2020-08-04
 
 ### Removed
 
   * [GlobalFishingWatch/gfw-eng-tasks#143](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/143): Removes
-    * invalid arguments (`proejct_id` and `dataset_id`) passed to `BigQueryCheckOperator`.
+    invalid arguments (`proejct_id` and `dataset_id`) passed to `BigQueryCheckOperator`.
 
 ## v1.0.3 - 2020-06-05
 
 ### Added
 
   * [GlobalFishingWatch/gfw-eng-tasks#105](https://github.com/GlobalFishingWatch/gfw-eng-tasks/issues/105): Adds
-    * table partition check when using `check_tables` or `check_table` in Airflow Variables.
+    table partition check when using `check_tables` or `check_table` in Airflow Variables.
 
 ## v1.0.2 - 2020-04-24
 

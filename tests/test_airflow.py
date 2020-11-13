@@ -148,6 +148,40 @@ class TestAirflow:
         dag = dag_factory(pipeline=dag_config).build('test_dag')
 
     @pytest.mark.parametrize("schedule_interval,expected", [
+        ('@daily', ('2018-01-01', '2018-01-01')),
+        ('@monthly', ('2018-01-01', '2018-01-31')),
+        ('@yearly', ('2018-01-01', '2018-12-31')),
+    ])
+    def test_source_date_range(self, schedule_interval, expected, dag_factory, dag_config):
+        schedule_interval_name = schedule_interval.replace('@', '')
+        factory = dag_factory(pipeline=dag_config, schedule_interval=schedule_interval)
+        dag = factory.build('test_source_date_range{}'.format(schedule_interval_name))
+        task = self.assert_expected_task(
+            task_id='test_source_date_range_{}'.format(schedule_interval_name),
+            expected=expected,
+            templated=factory.source_date_range(),
+            dag=dag
+        )
+        task.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+
+    @pytest.mark.parametrize("schedule_interval,expected", [
+        ('@daily', ('20180101', '20180101')),
+        ('@monthly', ('20180101', '20180131')),
+        ('@yearly', ('20180101', '20181231')),
+    ])
+    def test_source_date_range_nodash(self, schedule_interval, expected, dag_factory, dag_config):
+        schedule_interval_name = schedule_interval.replace('@', '')
+        factory = dag_factory(pipeline=dag_config, schedule_interval=schedule_interval)
+        dag = factory.build('test_source_date_range_nodash{}'.format(schedule_interval_name))
+        task = self.assert_expected_task(
+            task_id='test_source_date_range_nodash_{}'.format(schedule_interval_name),
+            expected=expected,
+            templated=factory.source_date_range_nodash(),
+            dag=dag
+        )
+        task.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
+
+    @pytest.mark.parametrize("schedule_interval,expected", [
         ('@daily', '20180101'),
         ('@monthly', '20180131'),
         ('@yearly', '20181231'),

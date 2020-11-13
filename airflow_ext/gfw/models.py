@@ -56,6 +56,17 @@ class DagFactory(object):
             raise ValueError('Unsupported schedule interval {}'.format(
                 self.schedule_interval))
 
+    def source_date_range_nodash(self):
+        if self.schedule_interval == '@daily':
+            return '{{ ds_nodash }}', '{{ ds_nodash }}'
+        elif self.schedule_interval == '@monthly':
+            return self.config['first_day_of_month_nodash'], self.config['last_day_of_month_nodash']
+        elif self.schedule_interval == '@yearly':
+            return self.config['first_day_of_year_nodash'], self.config['last_day_of_year_nodash']
+        else:
+            raise ValueError('Unsupported schedule interval {}'.format(
+                self.schedule_interval))
+
     def source_date_range(self):
         if self.schedule_interval == '@daily':
             return '{{ ds }}', '{{ ds }}'
