@@ -4,17 +4,20 @@ cache:
   directories:
   - ~/.cache/pip
 
+services:
+  - docker
+
 python:
-- 2.7
+- 3.7
 
 env:
 - SLUGIFY_USES_TEXT_UNIDECODE=yes
 
 install:
-- pip install -e .
+- docker-compose build
 
 script:
-- py.test tests
+- docker-compose run test
 
 notifications:
   slack:

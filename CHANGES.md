@@ -16,6 +16,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     Adds a new method to obtain the nodash version of `source_date_range`,
     useful when dealing with date-sharded bq inputs
 
+  * [PIPELINE-241](https://globalfishingwatch.atlassian.net/browse/PIPELINE-241):
+    Adds pin over `marshmallow-sqlalchemy` and `marshmallow` packages to create image without errors.
+    Also fixes travis and add build reference in the `README.md`.
+
 ## v1.0.4 - 2020-08-04
 
 ### Removed

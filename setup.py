@@ -13,6 +13,8 @@ from setuptools import setup
 
 DEPENDENCIES = [
     "apache-airflow==1.10.10",
+    "marshmallow==2.21.0",
+    "marshmallow-sqlalchemy==0.23.1",
     "cryptography",
     "funcsigs==1.0.0",
     "kubernetes==8.0.1",

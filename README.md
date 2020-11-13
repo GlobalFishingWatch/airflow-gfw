@@ -1,3 +1,6 @@
+master: [![Build Status](https://travis-ci.org/GlobalFishingWatch/airflow-gfw.svg?branch=master)](https://travis-ci.org/GlobalFishingWatch/airflow-gfw)
+develop: [![Build Status](https://travis-ci.org/GlobalFishingWatch/airflow-gfw.svg?branch=develop)](https://travis-ci.org/GlobalFishingWatch/airflow-gfw)
+
 # airflow-gfw
 
 It is a package providing an [Airflow](https://airflow.apache.org/) extension for GFW pipeline.
