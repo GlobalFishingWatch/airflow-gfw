@@ -12,24 +12,15 @@ from setuptools import setup
 
 
 DEPENDENCIES = [
-    "apache-airflow==1.10.10",
-    "marshmallow==2.21.0",
-    "marshmallow-sqlalchemy==0.23.1",
-    "cryptography",
-    "funcsigs==1.0.0",
-    "kubernetes==8.0.1",
-    "nose",
-    "pandas-gbq==0.9.0",
+    "apache-airflow==1.10.14",
+    "google-api-python-client",
+    "httplib2",
     "pytest",
-    "python-dateutil",
-    "pytz",
-    "udatetime",
-    "google-cloud-storage~=1.16"
+    "pytz"
 ]
 
 AIRFLOW_DEPENDENCIES = [
-    "google-api-python-client",
-    "snakebite"
+    "marshmallow==2.21.0"
 ]
 
 with codecs.open('README.md', encoding='utf-8') as f:

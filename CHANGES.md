@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v1.2.0 - 2020-12-15
+
+### Changed
+
+  * [PIPELINE-239](https://globalfishingwatch.atlassian.net/browse/PIPELINE-239):
+    Changes the version of `Apache Airflow` to `1.10.14`.
+
 ## v1.1.0 - 2020-11-13
 
 ### Added
