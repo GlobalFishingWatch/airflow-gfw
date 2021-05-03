@@ -8,6 +8,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v1.3.0 - 2021-04-27
+
+### Added
+
+  * [PIPELINE-84](https://globalfishingwatch.atlassian.net/browse/PIPELINE-84): Adds
+    the fix to parse correctly the url
+    (`https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.locations.jobs/get`)
+    to get the Dataflow job id and let knowing the status of the DF job from
+    Airflow side for function `wait_for_done()`.
+    Pin sqlalchemy version to `1.3.24` to avoid breaking tests.
+
 ## v1.2.0 - 2020-12-15
 
 ### Changed

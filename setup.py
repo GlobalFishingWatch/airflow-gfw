@@ -21,9 +21,9 @@ DEPENDENCIES = [
 AIRFLOW_DEPENDENCIES = [
     "google-api-python-client", # bigquery_hook
     "kubernetes==12.0.1", # kubernetes operator
-    "marshmallow==2.21.0", # flask-appbuilder build requirement
     "pandas_gbq==0.14.1", # bigquery_hook
-    "urllib3==1.25.11" # requests build requirement
+    "urllib3==1.25.11", # requests build requirement
+    "SQLAlchemy==1.3.24" # v1.4.x break tests
 ]
 
 with codecs.open('README.md', encoding='utf-8') as f:
