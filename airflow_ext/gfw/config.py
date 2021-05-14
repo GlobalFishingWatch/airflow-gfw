@@ -63,7 +63,8 @@ def failure_callback_gfw(context):
               f'DAG:     {ti.dag_id}\n' \
               f'TASKS:   {ti.task_id}\n' \
               f'Log-URL: {ti.log_url}\n' \
-              f'Reason:  {context["exception"]}\n'
+              f'Reason:  {context["exception"]}\n' \
+              f'Context:  {context}\n'
 
     slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
 
@@ -103,6 +104,7 @@ def default_args(config):
         'google_cloud_conn_id': CONNECTION_ID,
         'write_disposition': 'WRITE_TRUNCATE',
         'allow_large_results': True,
+        'on_retry_callback': failure_callback_gfw,
         'on_failure_callback': failure_callback_gfw,
     }
 
