@@ -55,12 +55,16 @@ def failure_callback_gfw(context):
     """
     ti = context['task_instance']
     default_owner = Variable.get('default_slack_task_owner', 'matias')
-    # owner = config.get('owner',False)
-    owner = False
+    sanitizeName = lambda x: '_'.join(x.split('_')[:-1]) if any(d in x.split('_') for d in ["daily","monthly","yearly"]) else x
+    dagVariables = Variable.get(sanitizeName(ti.dag_id), deserialize_json=True)
+    owner = dagVariables.get('slack_task_owner', default_owner)
     mention = lambda x: ','.join(['@'+user for user in x.split(',')])
+
     message = ':red_circle: TASK FAILS:\n' \
-              f'Owner:   {mention(owner if owner else default_owner)}\n' \
+              f'Owner:   {mention(owner)}\n' \
               f'DAG:     {ti.dag_id}\n' \
+              f'Airflow Variable:     {sanitizeName}\n' \
+              f'ValueAV:     {dagVariables}\n' \
               f'TASKS:   {ti.task_id}\n' \
               f'Log-URL: {ti.log_url}\n' \
               f'Reason:  {context["exception"]}\n' \
