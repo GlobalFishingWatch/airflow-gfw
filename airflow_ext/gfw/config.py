@@ -55,11 +55,17 @@ def failure_callback_gfw(context):
     """
     ti = context['task_instance']
     default_owner = Variable.get('default_slack_task_owner', 'matias')
-    # owner = config.get('owner',False)
-    owner = False
-    mention = lambda x: ','.join(['@'+user for user in x.split(',')])
+    try:
+        # Gets Airflow Variable from Dag id.
+        sanitizeAirflowVarName = lambda x: '_'.join(x.split('.')[0].split('_')[:-1]) if any(d in x.split('.')[0].split('_') for d in ["daily","monthly","yearly"]) else x.split('.')[0]
+        dagVariables = Variable.get(sanitizeAirflowVarName(ti.dag_id), deserialize_json=True)
+        owner = dagVariables.get('slack_task_owner', default_owner) if dagVariables else default_owner
+    except KeyError:
+        owner = default_owner
+    mention = lambda x: ','.join(['@'+user.strip() for user in x.split(',')])
+
     message = ':red_circle: TASK FAILS:\n' \
-              f'Owner:   {mention(owner if owner else default_owner)}\n' \
+              f'Owner:   {mention(owner)}\n' \
               f'DAG:     {ti.dag_id}\n' \
               f'TASKS:   {ti.task_id}\n' \
               f'Log-URL: {ti.log_url}\n' \
@@ -103,6 +109,7 @@ def default_args(config):
         'google_cloud_conn_id': CONNECTION_ID,
         'write_disposition': 'WRITE_TRUNCATE',
         'allow_large_results': True,
+        'on_retry_callback': failure_callback_gfw,
         'on_failure_callback': failure_callback_gfw,
     }
 
