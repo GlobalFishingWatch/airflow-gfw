@@ -25,7 +25,7 @@ INTERVAL = timedelta(hours=24)
 # NB:  See the commennts on conftest.py about how AIRFLOW_HOME gets initialized
 @pytest.fixture(scope='module')
 def airflow_init_db(airflow_home):
-    configuration.load_test_config()
+    configuration.conf.load_test_config()
     initdb()
 
 
