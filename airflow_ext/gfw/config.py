@@ -54,15 +54,22 @@ def failure_callback_gfw(context):
     :type context: dict
     """
     ti = context['task_instance']
+    default_owner = Variable.get('default_slack_task_owner', 'matias')
+    try:
+        # Gets Airflow Variable from Dag id.
+        sanitizeAirflowVarName = lambda x: '_'.join(x.split('.')[0].split('_')[:-1]) if any(d in x.split('.')[0].split('_') for d in ["daily","monthly","yearly"]) else x.split('.')[0]
+        dagVariables = Variable.get(sanitizeAirflowVarName(ti.dag_id), deserialize_json=True)
+        owner = dagVariables.get('slack_task_owner', default_owner) if dagVariables else default_owner
+    except KeyError:
+        owner = default_owner
+    mention = lambda x: ','.join(['@'+user.strip() for user in x.split(',')])
+
     message = ':red_circle: TASK FAILS:\n' \
-              'DAG:    {}\n' \
-              'TASKS:  {}\n' \
-              'Log-URL: {}\n' \
-              'Reason: {}\n' \
-        .format(ti.dag_id,
-                ti.task_id,
-                ti.log_url,
-                context['exception'])
+              f'Owner:   {mention(owner)}\n' \
+              f'DAG:     {ti.dag_id}\n' \
+              f'TASKS:   {ti.task_id}\n' \
+              f'Log-URL: {ti.log_url}\n' \
+              f'Reason:  {context["exception"]}\n'
 
     slack_webhook_token = BaseHook.get_connection(SLACK_CONN_ID).password
 

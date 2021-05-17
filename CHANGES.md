@@ -8,6 +8,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## v1.4.0 - 2021-05-13
+
+### Changed
+
+  * [PIPELINE-393](https://globalfishingwatch.atlassian.net/browse/PIPELINE-393): Changes
+    do NOT reattach to pod after restart kubernetes cluster. This will let
+    create a new pod to start processing the tasks from scratch and avoid
+    having last issues on keeping requesting the pod and get confusion when
+    it's declared as success state.
+
 ## v1.3.0 - 2021-04-27
 
 ### Added
